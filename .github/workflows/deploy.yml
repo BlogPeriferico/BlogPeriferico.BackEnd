@@ -3,54 +3,46 @@ name: Deploy to Azure App Service
 on:
   push:
     branches:
-      - main  # Ação será disparada sempre que houver um push na branch 'main'
+      - main  # O fluxo de trabalho será disparado quando houver um commit na branch main
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Usa a última versão do Ubuntu como runner
+    runs-on: ubuntu-latest  # Usar a última versão do Ubuntu
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v4  # Faz checkout do repositório
+        uses: actions/checkout@v4  # Fazer checkout do repositório
 
       - name: Configurar JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '21'  # Define a versão do Java 21
+          java-version: '21'  # Configura o JDK 21 para o projeto
 
-      - name: Navegar para o diretório correto
-        run: cd blogPeriferico  # Navega para o diretório onde o pom.xml está localizado
-
-      - name: Configurar Maven Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository  # Cache para dependências Maven
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Usa o hash do arquivo pom.xml para identificar mudanças
-          restore-keys: ${{ runner.os }}-maven
-
-      - name: Compilar o projeto com Maven
-        run: mvn clean package -DskipTests  # Compila o projeto e ignora os testes
+      - name: Navegar para o diretório correto e compilar o projeto com Maven
+        run: |
+          cd BlogPeriferico.BackEnd/blogPeriferico  # Navega até o diretório correto
+          mvn clean package -DskipTests  # Executa o Maven para compilar o projeto
 
       - name: Fazer upload do arquivo JAR
-        uses: actions/upload-artifact@v4  # Faz upload do JAR gerado
+        uses: actions/upload-artifact@v4  # Faz upload do arquivo JAR para ser usado na etapa de deploy
         with:
-          name: app-artifact
-          path: target/*.jar  # Caminho do JAR gerado pelo Maven
+          name: app-artifact  # Nome do artefato
+          path: target/*.jar  # Caminho do arquivo JAR gerado após o build
 
   deploy:
-    runs-on: ubuntu-latest
-    needs: build  # Só executa o deploy após a conclusão do build
+    runs-on: ubuntu-latest  # Usar a última versão do Ubuntu
+    needs: build  # A etapa de deploy depende da etapa de build
 
     steps:
       - name: Baixar artefato da etapa de build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4  # Baixa o artefato gerado pelo build
         with:
-          name: app-artifact  # Baixa o artefato gerado pelo build
+          name: app-artifact  # Nome do artefato a ser baixado
 
       - name: Deploy para Azure App Service
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v2  # Ação para deploy no Azure Web App
         with:
           app-name: 'BlogPeriferico'  # Nome do seu aplicativo no Azure
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}  # A chave de publicação que você configurou nos secrets do GitHub
-          package: '*.jar'  # O pacote a ser deployado é o arquivo JAR gerado
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}  # Perfil de publicação do Azure armazenado em Secrets
+          package: '*.jar'  # Pacote a ser enviado para o Azure (o arquivo JAR)
