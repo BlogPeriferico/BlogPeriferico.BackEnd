@@ -19,6 +19,9 @@ jobs:
           distribution: 'temurin'
           java-version: '21'  # Define a versão do Java 21
 
+      - name: Navegar para o diretório correto
+        run: cd blogPeriferico  # Navega para o diretório onde o pom.xml está localizado
+
       - name: Configurar Maven Cache
         uses: actions/cache@v3
         with:
