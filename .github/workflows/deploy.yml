@@ -21,7 +21,7 @@ jobs:
 
       - name: Navegar para o diretório correto e compilar o projeto com Maven
         run: |
-          cd BlogPeriferico.BackEnd/blogPeriferico  # Navega até o diretório correto
+          cd BlogPeriferico.BackEnd  # Navega para o diretório correto (ajuste conforme necessário)
           mvn clean package -DskipTests  # Executa o Maven para compilar o projeto
 
       - name: Fazer upload do arquivo JAR
@@ -46,3 +46,4 @@ jobs:
           app-name: 'BlogPeriferico'  # Nome do seu aplicativo no Azure
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}  # Perfil de publicação do Azure armazenado em Secrets
           package: '*.jar'  # Pacote a ser enviado para o Azure (o arquivo JAR)
+
