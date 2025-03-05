@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Listar diretórios para depuração
-        run: ls -R  
+        run: ls -R  # 🔍 Mostra a estrutura de arquivos
 
       - name: Configurar Java 21
         uses: actions/setup-java@v3
@@ -23,14 +23,14 @@ jobs:
 
       - name: Compilar o projeto com Maven
         run: |
-          cd BlogPeriferico.BackEnd/blogPeriferico || exit 1
+          cd blogPeriferia  # 🔥 Nome correto do diretório
           mvn clean package -DskipTests  
 
       - name: Upload do artefato para o job de deployment
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app
-          path: BlogPeriferico.BackEnd/blogPeriferico/target/*.jar  
+          path: blogPeriferia/target/*.jar  
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,4 +48,3 @@ jobs:
           app-name: 'BlogPeriferico'  
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: '*.jar'  
-
