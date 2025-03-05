@@ -31,9 +31,9 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven
 
-      # Navegar até o diretório onde o pom.xml está localizado
-      - name: Navegar até o diretório com o pom.xml
-        run: cd BlogPeriferico.BackEnd/blogPeriferico
+      # Navegar até o diretório correto onde o pom.xml está localizado
+      - name: Navegar até o diretório correto
+        run: cd BlogPeriferico.BackEnd
 
       - name: Compilar aplicação com Maven
         run: mvn clean package -DskipTests
