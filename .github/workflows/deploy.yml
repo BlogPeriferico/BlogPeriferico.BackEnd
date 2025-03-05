@@ -13,6 +13,11 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Exibir a estrutura de diretórios
+        run: |
+          echo "Estrutura de diretórios:"
+          ls -R
+
       - name: Configurar JDK 21
         uses: actions/setup-java@v3
         with:
