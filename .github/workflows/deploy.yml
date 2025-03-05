@@ -27,8 +27,8 @@ jobs:
           restore-keys: ${{ runner.os }}-maven
 
       # Navegar até o diretório onde o pom.xml está localizado
-      - name: Navegar até o diretório do projeto
-        run: cd blogPeriferico  # Altere 'blogPeriferico' para o nome correto do seu diretório
+      - name: Navegar até o diretório com o pom.xml
+        run: cd BlogPeriferico.BackEnd/blogPeriferico
 
       - name: Compilar aplicação com Maven
         run: mvn clean package -DskipTests
