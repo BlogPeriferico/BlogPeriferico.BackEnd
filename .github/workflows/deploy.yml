@@ -1,0 +1,44 @@
+name: Deploy App to Azure App Service
+
+on:
+  push:
+    branches:
+      - main  # Pode ser alterado para o nome do seu branch de deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'  # Altere conforme a versão do Java que você está usando
+
+      - name: Build Project
+        run: mvn clean install -DskipTests
+
+      - name: Upload Artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: blogperiferico-app
+          path: ${{ github.workspace }}/BlogPeriferico.BackEnd/blogPeriferico/target/*.jar
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: blogperiferico-app
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'BlogPeriferico'  # Nome da sua aplicação no Azure
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}  # Certifique-se de adicionar o perfil de publicação ao GitHub Secrets
+          package: '*.jar'
