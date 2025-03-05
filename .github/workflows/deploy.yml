@@ -28,10 +28,11 @@ jobs:
 
       - name: Compilar aplicação com Maven
         run: mvn clean package -DskipTests
+        working-directory: blogPeriferico
 
       - name: Publicar no Azure App Service
         uses: azure/webapps-deploy@v2
         with:
           app-name: "BlogPeriferia"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: target/*.jar
+          package: blogPeriferico/target/*.jar
