@@ -27,7 +27,9 @@ jobs:
           restore-keys: ${{ runner.os }}-maven
 
       - name: Compilar aplicação com Maven
-        run: mvn clean package -DskipTests
+        run: |
+          cd blogPeriferico
+          mvn clean package -DskipTests
 
       - name: Login no Azure
         uses: azure/login@v1
