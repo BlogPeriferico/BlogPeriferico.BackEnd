@@ -3,8 +3,7 @@ name: Deploy App to Azure App Service
 on:
   push:
     branches:
-      - main  # Gatilho para rodar o pipeline quando houver commits na branch main
-
+      - main  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,15 +19,15 @@ jobs:
 
       - name: Compilar o projeto com Maven
         run: |
-          cd BlogPeriferico.BackEnd/blogPeriferia  # Ajustando o caminho para onde o pom.xml está
-          ls  # Lista arquivos para verificar se o pom.xml está correto
-          mvn clean package -DskipTests  # Compila o projeto, ignorando testes
+          cd BlogPeriferico.BackEnd/blogPeriferia  
+          
+          mvn clean package -DskipTests  
 
       - name: Upload do artefato para o job de deployment
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app
-          path: BlogPeriferico.BackEnd/blogPeriferia/target/*.jar  # Ajustando caminho do JAR gerado
+          path: BlogPeriferico.BackEnd/blogPeriferia/target/*.jar 
 
   deploy:
     runs-on: ubuntu-latest
@@ -38,11 +37,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: springboot-app
-          path: .  # Baixa para o diretório raiz
+          path: .  
 
       - name: Deploy na Azure App Service
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'BlogPeriferico'  # Nome do App no Azure
+          app-name: 'BlogPeriferico'  
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: '*.jar'  # Deploy do arquivo gerado
+          package: '*.jar' 
