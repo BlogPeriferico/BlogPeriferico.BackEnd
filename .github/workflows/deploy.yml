@@ -19,7 +19,7 @@ jobs:
 
       - name: Compilar o projeto com Maven
         run: |
-          cd BlogPeriferico.BackEnd/blogPeriferia  
+          cd ./blogPeriferia/pom.xml  
           
           mvn clean package -DskipTests  
 
