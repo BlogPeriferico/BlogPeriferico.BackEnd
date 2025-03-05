@@ -11,7 +11,7 @@ public class BlogPerifericoController {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@GetMapping("/hello")
+	@GetMapping
 	public String helloWorld() {
 		return "Hello, World!";
 	}
