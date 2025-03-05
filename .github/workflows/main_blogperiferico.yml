@@ -25,7 +25,7 @@ jobs:
         run: mvn clean install
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3  # Atualizado para a versão v3
+        uses: actions/upload-artifact@v2  # Corrigido para a versão v2
         with:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3  # Atualizado para a versão v3
+        uses: actions/download-artifact@v2  # Corrigido para a versão v2
         with:
           name: java-app
 
@@ -51,3 +51,4 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_570BF0173E9D437EA6BA66D6B1182BA0 }}
           package: '*.jar'
+
