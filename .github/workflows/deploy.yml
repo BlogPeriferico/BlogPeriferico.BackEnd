@@ -3,7 +3,7 @@ name: Deploy to Azure App Service
 on:
   push:
     branches:
-      - main  # O fluxo será acionado quando houver um commit na branch main do repositório principal
+      - main  # O fluxo será acionado quando houver um commit na branch main
 
 jobs:
   build:
@@ -28,7 +28,8 @@ jobs:
 
       - name: Navegar para o diretório correto e compilar com Maven
         run: |
-          cd BlogPeriferico.BackEnd  # Navega até o diretório correto onde o pom.xml está
+          cd BlogPeriferico.BackEnd  # Navega para o diretório correto onde o pom.xml está
+          ls  # Verifica o conteúdo do diretório para garantir que o pom.xml está lá
           mvn clean package -DskipTests  # Executa o Maven para compilar o projeto
 
       - name: Fazer upload do arquivo JAR
