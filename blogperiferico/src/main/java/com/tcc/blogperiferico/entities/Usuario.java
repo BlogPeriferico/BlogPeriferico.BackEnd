@@ -26,8 +26,6 @@ public class Usuario {
 	@Column(name = "id_usuario")
 	private Long id;
 	
-	private String login;
-	
 	private String nome;
 	private String email;
 	private String senha;
@@ -53,9 +51,8 @@ public class Usuario {
 
 	}
 
-	public Usuario(Long id, String login, String nome, String email, String senha, String cpf, UsuarioRole roles) {
+	public Usuario(Long id, String nome, String email, String senha, String cpf, UsuarioRole roles) {
 		this.id = id;
-		this.login = login;
 		this.nome = nome;
 		this.email = email;
 		this.senha = senha;
@@ -65,7 +62,6 @@ public class Usuario {
 	
 	public Usuario(UsuarioDTO udto) {
 		id = udto.getId();
-		login = udto.getLogin();
 		nome = udto.getNome();
 		email = udto.getEmail();
 		senha = udto.getSenha();
@@ -80,14 +76,6 @@ public class Usuario {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String login) {
-		this.login = login;
 	}
 	
 	public String getNome() {
