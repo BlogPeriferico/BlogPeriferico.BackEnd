@@ -30,19 +30,19 @@ jobs:
 
       - name: Executar testes com Maven
         run: |
-          cd blogPeriferia
+          cd TCC-BACK-main
           mvn test
 
       - name: Compilar o projeto com Maven
         run: |
-          cd blogPeriferia
+          cd TCC-BACK-main
           mvn clean package
 
       - name: Upload do artefato para o job de deployment
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app
-          path: blogPeriferia/target/*.jar  
+          path: TCC-BACK-main/target/*.jar  
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
       - name: Deploy na Azure App Service
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'BlogPerigericoBackEnd'  
+          app-name: 'BlogPerifericoBackEnd'  
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: '*.jar'  
 
@@ -66,7 +66,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "❌ Falha no deploy do BlogPerigericoBackEnd"
+          SLACK_MESSAGE: "❌ Falha no deploy do BlogPerifericoBackEnd"
 
       - name: Criar issue se o deploy falhar
         if: failure()
@@ -78,6 +78,6 @@ jobs:
         if: failure()
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'BlogPerigericoBackEnd'
+          app-name: 'BlogPerifericoBackEnd'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: 'backup/*.jar'
