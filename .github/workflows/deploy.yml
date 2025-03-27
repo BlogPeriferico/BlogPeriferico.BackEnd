@@ -29,22 +29,18 @@ jobs:
           java-version: '21'
 
       - name: Executar testes com Maven
-        run: |
-          cd TCC-BACK-main
-          mvn test
+        run: mvn test
 
       - name: Compilar o projeto com Maven
-        run: |
-          cd TCC-BACK-main
-          mvn clean package
+        run: mvn clean package
 
       - name: Upload do artefato para o job de deployment
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app
-          path: TCC-BACK-main/target/*.jar  
+          path: target/*.jar  
 
- deploy:
+  deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
