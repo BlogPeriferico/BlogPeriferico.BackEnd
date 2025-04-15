@@ -17,14 +17,14 @@ public class DoacaoService {
 	@Autowired
     private DoacaoRepository doacaoRepository;
 
-    // Criar novo anúncio
+    // Criar nova doacao
     public DoacaoDTO criarDoacao(DoacaoDTO dto) {
     	Doacao doacao = new Doacao(dto.getId(), dto.getLocal(), dto.getTexto(), dto.getImagem(), dto.getTipoItem(), dto.getDataHoraCriacao());
     	doacao = doacaoRepository.save(doacao);
         return new DoacaoDTO(doacao.getId(), doacao.getLocal(), doacao.getTexto(), doacao.getImagem(), doacao.getTipoItem(), doacao.getDataHoraCriacao());
     }
 
-    // Listar todos os anúncios
+    // Listar todas as doações
     public List<DoacaoDTO> listarDoacoes() {
         List<Doacao> doacoes = doacaoRepository.findAll();
         return doacoes.stream()
@@ -32,13 +32,13 @@ public class DoacaoService {
                 .collect(Collectors.toList());
     }
 
-    // Buscar anúncio por ID
+    // Buscar doacao por ID
     public Optional<DoacaoDTO> buscarPorId(Long id) {
         Optional<Doacao> doacao = doacaoRepository.findById(id);
         return doacao.map(d -> new DoacaoDTO(d.getId(), d.getLocal(), d.getTexto(), d.getImagem(), d.getTipoItem(), d.getDataHoraCriacao()));
     }
 
-    // Atualizar anúncio
+    // Atualizar doacao
     public Optional<DoacaoDTO> atualizarDoacao(Long id, DoacaoDTO dto) {
         Optional<Doacao> doacaoOpt = doacaoRepository.findById(id);
         if (doacaoOpt.isPresent()) {
@@ -54,7 +54,7 @@ public class DoacaoService {
         return Optional.empty();
     }
 
-    // Excluir anúncio
+    // Excluir doacao
     public boolean excluirDoacao(Long id) {
         if (doacaoRepository.existsById(id)) {
         	doacaoRepository.deleteById(id);

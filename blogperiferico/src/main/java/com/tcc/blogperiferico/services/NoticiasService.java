@@ -17,14 +17,14 @@ public class NoticiasService {
 	@Autowired
     private NoticiasRepository noticiasRepository;
 
-    // Criar novo anúncio
+    // Criar nova noticia
     public NoticiasDTO criarNoticias(NoticiasDTO dto) {
     	Noticias noticias = new Noticias(dto.getId(), dto.getLocal(), dto.getTexto(), dto.getImagem(), dto.getDataHoraCriacao());
     	noticias = noticiasRepository.save(noticias);
         return new NoticiasDTO(noticias.getId(), dto.getLocal(), dto.getTexto(), dto.getImagem(), dto.getDataHoraCriacao());
     }
 
-    // Listar todos os anúncios
+    // Listar todos os noticias
     public List<NoticiasDTO> listarNoticias() {
         List<Noticias> noticias = noticiasRepository.findAll();
         return noticias.stream()
@@ -32,14 +32,14 @@ public class NoticiasService {
                 .collect(Collectors.toList());
     }
 
-    // Buscar anúncio por ID
+    // Buscar noticia por ID
     public Optional<NoticiasDTO> buscarPorId(Long id) {
         Optional<Noticias> noticias = noticiasRepository.findById(id);
         return noticias.map(n -> new NoticiasDTO(n.getId(), n.getLocal(), n.getTexto(), n.getImagem(), n.getDataHoraCriacao()));
     }
 
-    // Atualizar anúncio
-    public Optional<NoticiasDTO> atualizarNoticias(Long id, NoticiasDTO dto) {
+    // Atualizar noticia
+    public Optional<NoticiasDTO> atualizarNoticia(Long id, NoticiasDTO dto) {
         Optional<Noticias> noticiasOpt = noticiasRepository.findById(id);
         if (noticiasOpt.isPresent()) {
         	Noticias noticias = noticiasOpt.get();
@@ -53,7 +53,7 @@ public class NoticiasService {
         return Optional.empty();
     }
 
-    // Excluir anúncio
+    // Excluir noticia
     public boolean excluirNoticias(Long id) {
         if (noticiasRepository.existsById(id)) {
         	noticiasRepository.deleteById(id);

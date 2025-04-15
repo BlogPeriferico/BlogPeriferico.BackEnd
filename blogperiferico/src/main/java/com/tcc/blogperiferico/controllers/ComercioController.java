@@ -24,35 +24,35 @@ public class ComercioController {
     @Autowired
     private ComercioService comercioService;
 
-    // Criar um novo anúncio
+    // Criar um novo comercio
     @PostMapping
     public ResponseEntity<ComercioDTO> criarComercio(@RequestBody ComercioDTO dto) {
     	ComercioDTO novoComercio = comercioService.criarComercio(dto);
         return ResponseEntity.ok(novoComercio);
     }
 
-    // Listar todos os anúncios
+    // Listar todos os comercios
     @GetMapping
     public ResponseEntity<List<ComercioDTO>> listarComercio() {
         List<ComercioDTO> comercios= comercioService.listarComercios();
         return ResponseEntity.ok(comercios);
     }
 
-    // Buscar um anúncio por ID
+    // Buscar um comercio por ID
     @GetMapping("/{id}")
     public ResponseEntity<ComercioDTO> buscarPorId(@PathVariable Long id) {
         Optional<ComercioDTO> comercio = comercioService.buscarPorId(id);
         return comercio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Atualizar um anúncio por ID
+    // Atualizar um comercio por ID
     @PutMapping("/{id}")
     public ResponseEntity<ComercioDTO> atualizarComercio(@PathVariable Long id, @RequestBody ComercioDTO dto) {
         Optional<ComercioDTO> comercioAtualizado = comercioService.atualizarComercio(id, dto);
         return comercioAtualizado.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Excluir um anúncio por ID
+    // Excluir um comercio por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirComercio(@PathVariable Long id) {
         boolean excluido = comercioService.excluirComercio(id);

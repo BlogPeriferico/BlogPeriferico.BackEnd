@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tcc.blogperiferico.dto.AnuncioDTO;
 import com.tcc.blogperiferico.services.AnuncioService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/anuncios")
@@ -43,6 +46,12 @@ public class AnuncioController {
     public ResponseEntity<AnuncioDTO> buscarPorId(@PathVariable Long id) {
         Optional<AnuncioDTO> anuncio = anuncioService.buscarPorId(id);
         return anuncio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
+    @CrossOrigin(origins = " http://127.0.0.1:5500") 
+    @PostMapping("/salvar")
+    public ResponseEntity<AnuncioDTO> salvar(@Valid @RequestBody AnuncioDTO anuncio) {
+        return ResponseEntity.ok(anuncioService.criarAnuncio(anuncio));
     }
 
     // Atualizar um anúncio por ID

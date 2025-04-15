@@ -17,14 +17,14 @@ public class ComercioService {
 	@Autowired
     private ComercioRepository comercioRepository;
 
-    // Criar novo anúncio
+    // Criar novo comercio
     public ComercioDTO criarComercio(ComercioDTO dto) {
     	Comercio comercio = new Comercio(dto.getId(), dto.getLocal(), dto.getTexto(), dto.getImagem(), dto.getDataHoraCriacao());
     	comercio = comercioRepository.save(comercio);
         return new ComercioDTO(dto.getId(), comercio.getLocal(), comercio.getTexto(), comercio.getImagem(), comercio.getDataHoraCriacao());
     }
 
-    // Listar todos os anúncios
+    // Listar todos os comercio
     public List<ComercioDTO> listarComercios() {
         List<Comercio> comercios = comercioRepository.findAll();
         return comercios.stream()
@@ -32,13 +32,13 @@ public class ComercioService {
                 .collect(Collectors.toList());
     }
 
-    // Buscar anúncio por ID
+    // Buscar comercio por ID
     public Optional<ComercioDTO> buscarPorId(Long id) {
         Optional<Comercio> comercio = comercioRepository.findById(id);
         return comercio.map(c -> new ComercioDTO(c.getId(), c.getLocal(), c.getTexto(), c.getImagem(), c.getDataHoraCriacao()));
     }
 
-    // Atualizar anúncio
+    // Atualizar comercio
     public Optional<ComercioDTO> atualizarComercio(Long id, ComercioDTO dto) {
         Optional<Comercio> comercioOpt = comercioRepository.findById(id);
         if (comercioOpt.isPresent()) {
@@ -53,7 +53,7 @@ public class ComercioService {
         return Optional.empty();
     }
 
-    // Excluir anúncio
+    // Excluir comercio
     public boolean excluirComercio(Long id) {
         if (comercioRepository.existsById(id)) {
         	comercioRepository.deleteById(id);
