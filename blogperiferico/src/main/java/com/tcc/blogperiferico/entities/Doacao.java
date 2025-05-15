@@ -28,7 +28,7 @@ public class Doacao {
     private LocalDateTime dataHoraCriacao = LocalDateTime.now();
 	
 	@ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 	
 	//Getters and Setters
@@ -79,7 +79,5 @@ public class Doacao {
 		this.tipoItem = tipoItem;
 		this.dataHoraCriacao = LocalDateTime.now();
 	}
-	
-	
 	
 }

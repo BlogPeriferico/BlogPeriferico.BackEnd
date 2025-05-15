@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="relatorio_doacao" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <!-- Campos -->
+    <field name="local" class="java.lang.String"/>
+    <field name="texto" class="java.lang.String"/>
+    <field name="tipoItem" class="java.lang.String"/>
+    <field name="dataHoraCriacao" class="java.lang.String"/>
+
+    <!-- Título -->
+    <title>
+        <band height="50">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Relatório de Doações]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- Cabeçalho das Colunas -->
+    <columnHeader>
+        <band height="25">
+            <staticText>
+                <reportElement x="0" y="0" width="130" height="25" backcolor="#E0E0E0" mode="Opaque"/>
+                <box><pen lineWidth="0.5" lineColor="#999999"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Texto]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="130" y="0" width="180" height="25" backcolor="#E0E0E0" mode="Opaque"/>
+                <box><pen lineWidth="0.5" lineColor="#999999"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Local]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="310" y="0" width="75" height="25" backcolor="#E0E0E0" mode="Opaque"/>
+                <box><pen lineWidth="0.5" lineColor="#999999"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Tipo]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="385" y="0" width="170" height="25" backcolor="#E0E0E0" mode="Opaque"/>
+                <box><pen lineWidth="0.5" lineColor="#999999"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Data/Hora]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- Detalhes dos Dados -->
+    <detail>
+        <band height="25">
+            <textField>
+                <reportElement x="0" y="0" width="130" height="25"/>
+                <box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{texto}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="130" y="0" width="180" height="25"/>
+                <box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{local}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="310" y="0" width="75" height="25"/>
+                <box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{tipoItem}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="385" y="0" width="170" height="25"/>
+                <box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{dataHoraCriacao}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+</jasperReport>
