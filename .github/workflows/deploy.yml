@@ -15,7 +15,7 @@ jobs:
       - name: Listar diretórios para depuração
         run: ls -R
 
-      - name: Entrar no diretório do projeto
+      - name: Entrar no diretório
         run: cd TCC-BACK-main
 
       - name: Configurar cache do Maven
