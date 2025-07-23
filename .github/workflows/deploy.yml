@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  
 
 jobs:
   build:
@@ -15,11 +16,14 @@ jobs:
       - name: Listar diretórios para depuração
         run: ls -R
 
+      - name: Entrar no diretório
+        run: cd TCC-BACK-main
+
       - name: Configurar cache do Maven
         uses: actions/cache@v3
         with:
           path: ~/.m2
-          key: maven-${{ runner.os }}-${{ hashFiles('pom.xml') }}
+          key: maven-${{ runner.os }}-${{ hashFiles('TCC-BACK-main/pom.xml') }}
           restore-keys: maven-${{ runner.os }}-
 
       - name: Configurar Java 21
@@ -29,16 +33,16 @@ jobs:
           java-version: '21'
 
       - name: Executar testes com Maven
-        run: mvn test
+        run: mvn -f TCC-BACK-main/pom.xml test
 
       - name: Compilar o projeto com Maven
-        run: mvn clean package
+        run: mvn -f TCC-BACK-main/pom.xml clean package
 
       - name: Upload do artefato para o job de deployment
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app
-          path: target/*.jar
+          path: TCC-BACK-main/target/*.jar
 
   deploy:
     runs-on: ubuntu-latest
