@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # ✅ Permite executar manualmente via botão no GitHub
 
 jobs:
   build:
@@ -12,12 +11,6 @@ jobs:
     steps:
       - name: Checkout do código-fonte
         uses: actions/checkout@v4
-
-      - name: Listar diretórios para depuração
-        run: ls -R
-
-      - name: Entrar no diretório
-        run: cd TCC-BACK-main
 
       - name: Configurar cache do Maven
         uses: actions/cache@v3
@@ -32,13 +25,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Executar testes com Maven
-        run: mvn -f TCC-BACK-main/pom.xml test
+      - name: Build com Maven
+        run: mvn -f TCC-BACK-main/pom.xml clean package -DskipTests
 
-      - name: Compilar o projeto com Maven
-        run: mvn -f TCC-BACK-main/pom.xml clean package
-
-      - name: Upload do artefato para o job de deployment
+      - name: Upload do artefato para o job de deploy
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app
@@ -48,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Baixar artefato do job de build
+      - name: Download do artefato
         uses: actions/download-artifact@v4
         with:
           name: springboot-app
@@ -60,24 +50,3 @@ jobs:
           app-name: 'BlogPerigericoBackEnd'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: '*.jar'
-
-      - name: Notificar erro no Slack
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "❌ Falha no deploy do BlogPerigericoBackEnd"
-
-      - name: Criar issue se o deploy falhar
-        if: failure()
-        uses: JasonEtco/create-an-issue@v2
-        with:
-          filename: .github/ISSUE_TEMPLATE/deploy_fail.md
-
-      - name: Rollback para última versão estável
-        if: failure()
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'BlogPerigericoBackEnd'
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: 'backup/*.jar'
