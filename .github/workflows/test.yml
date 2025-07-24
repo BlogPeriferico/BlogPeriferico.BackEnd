@@ -1,11 +1,11 @@
-name: Teste do botão
+name: Teste Manual
 
 on:
   workflow_dispatch:
 
 jobs:
-  exemplo:
+  teste:
     runs-on: ubuntu-latest
     steps:
-      - name: Mensagem de teste
-        run: echo "Executou com sucesso!"
+      - name: Echo de teste
+        run: echo "Funcionando!"
