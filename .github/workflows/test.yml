@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  exemplo:
     runs-on: ubuntu-latest
     steps:
-      - name: Testando botão
-        run: echo "Funcionou!"
+      - name: Mensagem de teste
+        run: echo "Executou com sucesso!"
