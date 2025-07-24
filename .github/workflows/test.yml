@@ -1,11 +1,11 @@
-name: Test Manual Workflow
+name: Teste do botão
 
 on:
   workflow_dispatch:
 
 jobs:
-  say-hello:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Print message
-        run: echo "Olá, GitHub Actions está funcionando!"
+      - name: Testando botão
+        run: echo "Funcionou!"
