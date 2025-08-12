@@ -1,5 +1,6 @@
 package com.tcc.blogperiferico.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.tcc.blogperiferico.dto.NoticiaDTO;
 import com.tcc.blogperiferico.entities.Noticia;
+import com.tcc.blogperiferico.entities.Usuario;
 import com.tcc.blogperiferico.repository.NoticiaRepository;
+import com.tcc.blogperiferico.repository.UsuarioRepository;
 
 @Service
 public class NoticiaService {
@@ -17,39 +20,63 @@ public class NoticiaService {
     @Autowired
     private NoticiaRepository noticiasRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository; // Adicionado para buscar Usuario
+
     // Criar novo anúncio
     public NoticiaDTO criarNoticia(NoticiaDTO dto) {
-    	Noticia noticias = new Noticia(dto.getId(), dto.getZona(), dto.getTitulo(), dto.getTexto(), dto.getImagem(), dto.getDataHoraCriacao(), dto.getIdUsuario());
-    	noticias = noticiasRepository.save(noticias);
-        return new NoticiaDTO(noticias.getId(), dto.getZona(), dto.getTexto(), dto.getTexto(), dto.getImagem(), dto.getDataHoraCriacao(), dto.getIdUsuario());
+        System.out.println("NoticiaDTO recebido no serviço: " + dto);
+        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
+        System.out.println("Usuário encontrado: " + usuario.getEmail());
+        Noticia noticia = new Noticia();
+        noticia.setLocal(dto.getLocal());
+        noticia.setZona(dto.getZona());
+        noticia.setTitulo(dto.getTitulo());
+        noticia.setTexto(dto.getTexto());
+        noticia.setImagem(dto.getImagem());
+        noticia.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+        noticia.setIdUsuario(usuario);
+        noticia = noticiasRepository.save(noticia);
+        System.out.println("Notícia salva: " + noticia.getId());
+        return new NoticiaDTO(noticia);
     }
-
     // Listar todos os anúncios
     public List<NoticiaDTO> listarNoticias() {
         List<Noticia> noticias = noticiasRepository.findAll();
         return noticias.stream()
-                .map(n -> new NoticiaDTO(n.getId(), n.getZona(), n.getTitulo(), n.getTexto(), n.getImagem(), n.getDataHoraCriacao(), n.getIdUsuario()))
+                .map(NoticiaDTO::new)
                 .collect(Collectors.toList());
     }
 
     // Buscar anúncio por ID
     public Optional<NoticiaDTO> buscarPorId(Long id) {
-        Optional<Noticia> noticias = noticiasRepository.findById(id);
-        return noticias.map(n -> new NoticiaDTO(n.getId(), n.getZona(), n.getTitulo(), n.getTexto(), n.getImagem(), n.getDataHoraCriacao(), n.getIdUsuario()));
+        Optional<Noticia> noticia = noticiasRepository.findById(id);
+        return noticia.map(NoticiaDTO::new);
     }
 
     // Atualizar anúncio
     public Optional<NoticiaDTO> atualizarNoticia(Long id, NoticiaDTO dto) {
-        Optional<Noticia> noticiasOpt = noticiasRepository.findById(id);
-        if (noticiasOpt.isPresent()) {
-        	Noticia noticias = noticiasOpt.get();
-        	noticias.setZona(dto.getZona());
-        	noticias.setTitulo(dto.getTitulo());
-        	noticias.setTexto(dto.getTexto());
-        	noticias.setImagem(dto.getImagem());
-        	noticias.setDataHoraCriacao(dto.getDataHoraCriacao());
-        	noticiasRepository.save(noticias);
-            return Optional.of(new NoticiaDTO(noticias.getId(), noticias.getZona(), noticias.getTitulo(), noticias.getTexto(), noticias.getImagem(), noticias.getDataHoraCriacao(), noticias.getIdUsuario()));
+        Optional<Noticia> noticiaOpt = noticiasRepository.findById(id);
+        if (noticiaOpt.isPresent()) {
+            Noticia noticia = noticiaOpt.get();
+
+            // Buscar a entidade Usuario pelo idUsuario do DTO
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
+
+            noticia.setLocal(dto.getLocal());
+            noticia.setZona(dto.getZona());
+            noticia.setTitulo(dto.getTitulo());
+            noticia.setTexto(dto.getTexto());
+            noticia.setImagem(dto.getImagem());
+            noticia.setDataHoraCriacao(dto.getDataHoraCriacao());
+            noticia.setIdUsuario(usuario);
+
+            // Salvar no banco
+            noticia = noticiasRepository.save(noticia);
+
+            return Optional.of(new NoticiaDTO(noticia));
         }
         return Optional.empty();
     }

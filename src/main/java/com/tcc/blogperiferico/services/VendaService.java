@@ -1,49 +1,77 @@
 package com.tcc.blogperiferico.services;
 
+import com.tcc.blogperiferico.dto.VendaDTO;
+import com.tcc.blogperiferico.entities.Usuario;
+import com.tcc.blogperiferico.entities.Venda;
+import com.tcc.blogperiferico.repository.UsuarioRepository;
+import com.tcc.blogperiferico.repository.VendaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.tcc.blogperiferico.dto.VendaDTO;
-import com.tcc.blogperiferico.entities.Venda;
-import com.tcc.blogperiferico.repository.VendaRepository;
-
 @Service
 public class VendaService {
 
-
-	@Autowired
+    @Autowired
     private VendaRepository vendaRepository;
 
-    // Criar novo anúncio
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // Criar nova venda
     public VendaDTO criarVenda(VendaDTO dto) {
-        Venda vendas = new Venda(dto.getId(), dto.getTitulo(), dto.getDescricao(), dto.getImagem(), dto.getValor(), dto.getTelefone(), dto.getCpf(), dto.getZona(), dto.getDataHoraCriacao(), dto.getIdUsuario());
-        vendas = vendaRepository.save(vendas);
-        return new VendaDTO(vendas.getId(), dto.getTitulo(), dto.getDescricao(), dto.getImagem(), dto.getValor(), dto.getTelefone(), dto.getCpf(), dto.getZona(), dto.getDataHoraCriacao(), dto.getIdUsuario());
+        System.out.println("VendaDTO recebido no serviço: " + dto);
+        // Buscar o usuário pelo idUsuario
+        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
+        System.out.println("Usuário encontrado: " + usuario.getEmail());
+
+        // Criar a entidade Venda
+        Venda venda = new Venda();
+        venda.setTitulo(dto.getTitulo());
+        venda.setDescricao(dto.getDescricao());
+        venda.setImagem(dto.getImagem());
+        venda.setValor(dto.getValor());
+        venda.setTelefone(dto.getTelefone());
+        venda.setCpf(dto.getCpf());
+        venda.setZona(dto.getZona());
+        venda.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+        venda.setIdUsuario(usuario);
+
+        // Salvar no banco
+        venda = vendaRepository.save(venda);
+        System.out.println("Venda salva: " + venda.getId());
+
+        // Retornar DTO
+        return new VendaDTO(venda);
     }
 
-    // Listar todos os anúncios
+    // Listar todas as vendas
     public List<VendaDTO> listarVendas() {
         List<Venda> vendas = vendaRepository.findAll();
         return vendas.stream()
-                .map(v -> new VendaDTO(v.getId(), v.getTitulo(), v.getDescricao(), v.getImagem(), v.getValor(), v.getTelefone(), v.getCpf(), v.getZona(), v.getDataHoraCriacao(), v.getIdUsuario()))
+                .map(VendaDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Buscar anúncio por ID
+    // Buscar venda por ID
     public Optional<VendaDTO> buscarPorId(Long id) {
-        Optional<Venda> vendas = vendaRepository.findById(id);
-        return vendas.map(v -> new VendaDTO(v.getId(), v.getTitulo(), v.getDescricao(), v.getImagem(), v.getValor(), v.getTelefone(), v.getCpf(), v.getZona(), v.getDataHoraCriacao(), v.getIdUsuario()));
+        Optional<Venda> venda = vendaRepository.findById(id);
+        return venda.map(VendaDTO::new);
     }
 
-    // Atualizar anúncio
+    // Atualizar venda
     public Optional<VendaDTO> atualizarVenda(Long id, VendaDTO dto) {
         Optional<Venda> vendaOpt = vendaRepository.findById(id);
         if (vendaOpt.isPresent()) {
             Venda venda = vendaOpt.get();
+            // Buscar o usuário pelo idUsuario
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
             venda.setTitulo(dto.getTitulo());
             venda.setDescricao(dto.getDescricao());
             venda.setImagem(dto.getImagem());
@@ -51,20 +79,20 @@ public class VendaService {
             venda.setTelefone(dto.getTelefone());
             venda.setCpf(dto.getCpf());
             venda.setZona(dto.getZona());
-            venda.setDataHoraCriacao(dto.getDataHoraCriacao());
+            venda.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+            venda.setIdUsuario(usuario);
             vendaRepository.save(venda);
-            return Optional.of(new VendaDTO(venda.getId(), venda.getTitulo(), venda.getDescricao(), venda.getImagem(), venda.getValor(), venda.getTelefone(), venda.getCpf(), venda.getZona(), venda.getDataHoraCriacao(), venda.getIdUsuario()));
+            return Optional.of(new VendaDTO(venda));
         }
         return Optional.empty();
     }
 
-    // Excluir anúncio
+    // Excluir venda
     public boolean excluirVenda(Long id) {
         if (vendaRepository.existsById(id)) {
-        	vendaRepository.deleteById(id);
+            vendaRepository.deleteById(id);
             return true;
         }
         return false;
     }
-	
 }

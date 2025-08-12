@@ -30,6 +30,7 @@ public class NoticiaController {
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<NoticiaDTO> criarNoticia(@RequestBody NoticiaDTO dto) {
+        System.out.println("NoticiaDTO recebido no controller: " + dto);
         NoticiaDTO nova = noticiasService.criarNoticia(dto);
         return ResponseEntity.ok(nova);
     }

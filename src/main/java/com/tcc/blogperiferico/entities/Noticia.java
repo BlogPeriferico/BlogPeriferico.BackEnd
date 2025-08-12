@@ -17,106 +17,105 @@ import jakarta.persistence.Table;
 @Table(name = "tb_noticias")
 public class Noticia {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String local;
-	private String titulo;
+    private String local;
+    private String titulo;
 
-	@Column(columnDefinition = "TEXT")
-	private String texto;
+    @Column(columnDefinition = "TEXT")
+    private String texto;
 
-	@Column(columnDefinition = "TEXT")
-	private String imagem;
+    @Column(columnDefinition = "TEXT")
+    private String imagem;
 
-	@Enumerated(EnumType.STRING) // Garantindo que o enum seja armazenado como string
-	private Zona zona;
+    @Enumerated(EnumType.STRING)
+    private Zona zona;
 
-	private LocalDateTime dataHoraCriacao = LocalDateTime.now();
+    private LocalDateTime dataHoraCriacao; // Removido inicialização direta
 
-	@ManyToOne
-	@JoinColumn(name = "usuario_id", nullable = false)
-	private Usuario idUsuario;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario idUsuario;
 
-	// Getters and Setters
-	public Long getId() {
-		return id;
-	}
+    // Getters e Setters
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getLocal() {
-		return local;
-	}
+    public String getLocal() {
+        return local;
+    }
 
-	public void setLocal(String local) {
-		this.local = local;
-	}
+    public void setLocal(String local) {
+        this.local = local;
+    }
 
-	public String getTexto() {
-		return texto;
-	}
+    public String getTexto() {
+        return texto;
+    }
 
-	public void setTexto(String texto) {
-		this.texto = texto;
-	}
+    public void setTexto(String texto) {
+        this.texto = texto;
+    }
 
-	public String getImagem() {
-		return imagem;
-	}
+    public String getImagem() {
+        return imagem;
+    }
 
-	public void setImagem(String imagem) {
-		this.imagem = imagem;
-	}
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
 
-	public String getTitulo() {
-		return titulo;
-	}
+    public String getTitulo() {
+        return titulo;
+    }
 
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-	public Zona getZona() {
-		return zona;
-	}
+    public Zona getZona() {
+        return zona;
+    }
 
-	public void setZona(Zona zona) {
-		this.zona = zona;
-	}
+    public void setZona(Zona zona) {
+        this.zona = zona;
+    }
 
-	public Usuario getIdUsuario() {
-		return idUsuario;
-	}
+    public LocalDateTime getDataHoraCriacao() {
+        return dataHoraCriacao;
+    }
 
-	public void setUsuario(Usuario idUsuario) {
-		this.idUsuario = idUsuario;
-	}
+    public void setDataHoraCriacao(LocalDateTime dataHoraCriacao) {
+        this.dataHoraCriacao = dataHoraCriacao;
+    }
 
-	public LocalDateTime getDataHoraCriacao() {
-		return dataHoraCriacao;
-	}
+    public Usuario getIdUsuario() {
+        return idUsuario;
+    }
 
-	public void setDataHoraCriacao(LocalDateTime dataHoraCriacao) {
-		this.dataHoraCriacao = dataHoraCriacao;
-	}
+    public void setIdUsuario(Usuario idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
-	// Construtores
-	public Noticia() {
-	}
+    // Construtores
+    public Noticia() {
+        this.dataHoraCriacao = LocalDateTime.now(); // Inicializar no construtor
+    }
 
-	public Noticia(Long id, Zona zona, String titulo, String texto, String imagem, LocalDateTime dataHoraCriacao,
-			Usuario idUsuario) {
-		this.id = id;
-		this.zona = zona;
-		this.titulo = titulo;
-		this.texto = texto;
-		this.imagem = imagem;
-		this.dataHoraCriacao = dataHoraCriacao; // Hora é gerada automaticamente
-		this.idUsuario = idUsuario;
-	}
-
+    public Noticia(Long id, Zona zona, String titulo, String texto, String imagem, LocalDateTime dataHoraCriacao, Usuario idUsuario) {
+        this.id = id;
+        this.zona = zona;
+        this.titulo = titulo;
+        this.texto = texto;
+        this.imagem = imagem;
+        this.dataHoraCriacao = dataHoraCriacao != null ? dataHoraCriacao : LocalDateTime.now();
+        this.idUsuario = idUsuario;
+    }
 }

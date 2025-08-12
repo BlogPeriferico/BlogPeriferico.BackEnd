@@ -1,10 +1,10 @@
 package com.tcc.blogperiferico.controllers;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.tcc.blogperiferico.dto.DoacaoDTO;
+import com.tcc.blogperiferico.services.DoacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tcc.blogperiferico.dto.DoacaoDTO;
-import com.tcc.blogperiferico.services.DoacaoService;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/doacoes")
@@ -27,13 +27,13 @@ public class DoacaoController {
     private DoacaoService doacaoService;
 
     // Criar um novo anúncio
+    @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<DoacaoDTO> criarDoacao(@RequestBody DoacaoDTO dto) {
-    	DoacaoDTO novoDoacao = doacaoService.criarDoacao(dto);
+        System.out.println("DoacaoDTO recebido no controller: " + dto);
+        DoacaoDTO novoDoacao = doacaoService.criarDoacao(dto);
         return ResponseEntity.ok(novoDoacao);
     }
-    
-
 
     // Listar todos os anúncios
     @GetMapping
@@ -50,6 +50,7 @@ public class DoacaoController {
     }
 
     // Atualizar um anúncio por ID
+    @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<DoacaoDTO> atualizarDoacao(@PathVariable Long id, @RequestBody DoacaoDTO dto) {
         Optional<DoacaoDTO> doacaoAtualizado = doacaoService.atualizarDoacao(id, dto);
@@ -57,6 +58,7 @@ public class DoacaoController {
     }
 
     // Excluir um anúncio por ID
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirDoacao(@PathVariable Long id) {
         boolean excluido = doacaoService.excluirDoacao(id);
