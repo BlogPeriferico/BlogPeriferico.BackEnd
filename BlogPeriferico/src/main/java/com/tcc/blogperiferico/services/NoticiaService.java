@@ -70,7 +70,7 @@ public class NoticiaService {
             noticia.setTitulo(dto.getTitulo());
             noticia.setTexto(dto.getTexto());
             noticia.setImagem(dto.getImagem());
-            noticia.setDataHoraCriacao(dto.getDataHoraCriacao());
+            noticia.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
             noticia.setIdUsuario(usuario);
 
             // Salvar no banco
