@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - dev-pedro # permite deploy também da dev-pedro se quiser
 
 jobs:
   build:
