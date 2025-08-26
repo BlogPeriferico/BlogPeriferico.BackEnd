@@ -1,10 +1,7 @@
 package com.tcc.blogperiferico.controllers;
 
-import com.tcc.blogperiferico.dto.AuthRequest;
-import com.tcc.blogperiferico.dto.AuthResponse;
-import com.tcc.blogperiferico.entities.Usuario;
-import com.tcc.blogperiferico.repository.UsuarioRepository;
-import com.tcc.blogperiferico.security.JWTUtil;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,12 +12,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.tcc.blogperiferico.dto.AuthRequest;
+import com.tcc.blogperiferico.dto.AuthResponse;
+import com.tcc.blogperiferico.entities.Usuario;
+import com.tcc.blogperiferico.repository.UsuarioRepository;
+import com.tcc.blogperiferico.security.JWTUtil;
+import com.tcc.blogperiferico.services.EmailService;
+import com.tcc.blogperiferico.services.PasswordResetService;
 
 @RestController
 @RequestMapping("/auth")
@@ -38,6 +44,12 @@ public class AuthController {
 
     @Autowired
     private JWTUtil jwtUtil;
+    
+    @Autowired
+    private PasswordResetService passwordResetService;
+    
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
@@ -77,5 +89,49 @@ public class AuthController {
     @GetMapping("/admin-only")
     public ResponseEntity<?> adminOnly() {
         return ResponseEntity.ok("Você tem acesso ADMINISTRADOR.");
+    }
+    
+  //Enviar token de redefinição
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity<?> esqueciSenha(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com esse email"));
+
+        // Gera e salva o código temporário
+        String codigo = passwordResetService.generateResetCode(email);
+
+        // Envia o código por e-mail
+        emailService.enviarCodigoRedefinicao(email, codigo);
+
+        return ResponseEntity.ok("Código enviado para o e-mail do usuário");
+    }
+
+
+    //Redefinir senha usando token
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<?> redefinirSenha(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String codigo = body.get("codigo");
+        String novaSenha = body.get("novaSenha");
+
+        if (email == null || codigo == null || novaSenha == null) {
+            return ResponseEntity.badRequest().body("Email, código e nova senha são obrigatórios");
+        }
+
+        if (!passwordResetService.validateResetCode(email, codigo)) {
+            return ResponseEntity.badRequest().body("Código inválido ou expirado");
+        }
+
+        var usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Usuário não encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        usuario.setSenha(new BCryptPasswordEncoder().encode(novaSenha));
+        usuarioRepository.save(usuario);
+
+        return ResponseEntity.ok("Senha redefinida com sucesso");
     }
 }

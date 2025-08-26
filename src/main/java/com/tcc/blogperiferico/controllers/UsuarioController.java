@@ -30,13 +30,11 @@ public class UsuarioController {
     @Autowired
     private UsuarioService service;
 
-    @PreAuthorize("hasRole('ROLE_VISITANTE', 'ROLE_USUARIO','ROLE_ADMINISTRADOR')")
     @GetMapping("/listar")
     public ResponseEntity<List<UsuarioDTO>> listarTudo() {
         return ResponseEntity.ok(service.listar());
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMINISTRADOR', 'ROLE_USUARIO')")
     @GetMapping("/listar/{id}")
     public ResponseEntity<UsuarioDTO> listar(@PathVariable Long id) {
         return ResponseEntity.ok(service.listar(id));

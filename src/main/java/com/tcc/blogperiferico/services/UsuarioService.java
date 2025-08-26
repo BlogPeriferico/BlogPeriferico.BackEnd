@@ -41,8 +41,7 @@ public class UsuarioService {
         usuario.setNome(user.getNome());
         usuario.setEmail(user.getEmail());
         usuario.setSenha(encoder.encode(user.getSenha()));
-        usuario.setRoles(user.getRoles() != null ? user.getRoles() : UsuarioRole.ROLE_VISITANTE);
-
+        usuario.setRoles(UsuarioRole.ROLE_USUARIO);
         return new UsuarioDTO(repository.save(usuario));
     }
 
