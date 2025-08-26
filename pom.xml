@@ -103,6 +103,13 @@
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-mail</artifactId>
 	</dependency>
+	
+	<!-- Blob -->
+	<dependency>
+	  <groupId>com.azure</groupId>
+	  <artifactId>azure-storage-blob</artifactId>
+	  <version>12.27.0</version>
+	</dependency>
 
   </dependencies>
 

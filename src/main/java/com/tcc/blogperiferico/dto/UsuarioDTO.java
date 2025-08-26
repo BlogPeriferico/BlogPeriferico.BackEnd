@@ -30,6 +30,8 @@ public class UsuarioDTO {
     @Enumerated(EnumType.STRING)
     private UsuarioRole roles;
 
+    private String fotoPerfil;
+
     public UsuarioDTO() {}
 
     public UsuarioDTO(Long id, String nome, String email, String senha, UsuarioRole roles) {
@@ -46,6 +48,7 @@ public class UsuarioDTO {
         email = u.getEmail();
         senha = u.getSenha();
         roles = u.getRoles();
+        fotoPerfil = u.getFotoPerfil();
     }
 
     public Long getId() { return id; }
@@ -62,4 +65,7 @@ public class UsuarioDTO {
 
     public UsuarioRole getRoles() { return roles; }
     public void setRoles(UsuarioRole roles) { this.roles = roles; }
+
+    public String getFotoPerfil() { return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
 }

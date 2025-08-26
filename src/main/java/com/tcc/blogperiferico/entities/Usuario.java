@@ -38,6 +38,9 @@ public class Usuario {
     @Column(name = "role", length = 30)
     private UsuarioRole roles;
 
+    @Column(columnDefinition = "TEXT")
+    private String fotoPerfil;
+
     @OneToMany(mappedBy = "idUsuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Noticia> noticias = new ArrayList<>();
 
@@ -66,6 +69,7 @@ public class Usuario {
         this.email = udto.getEmail();
         this.senha = udto.getSenha();
         this.roles = udto.getRoles();
+        this.fotoPerfil = udto.getFotoPerfil();
     }
 
     public Long getId() { return id; }
@@ -82,6 +86,9 @@ public class Usuario {
 
     public UsuarioRole getRoles() { return roles; }
     public void setRoles(UsuarioRole roles) { this.roles = roles; }
+
+    public String getFotoPerfil() { return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
 
     public List<Noticia> getNoticias() { return noticias; }
     public void setNoticias(List<Noticia> noticias) { this.noticias = noticias; }

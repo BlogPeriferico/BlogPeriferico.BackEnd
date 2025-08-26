@@ -1,11 +1,13 @@
 package com.tcc.blogperiferico.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tcc.blogperiferico.dto.VagaDTO;
 import com.tcc.blogperiferico.services.VagaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,9 @@ public class VagaController {
 
     @Autowired
     private VagaService vagaService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     // VISITANTE pode visualizar
     @GetMapping
@@ -30,23 +35,31 @@ public class VagaController {
         return vaga.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // USUARIO e ADMINISTRADOR podem criar
+    // Criar vaga com imagem
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
-    @PostMapping
-    public ResponseEntity<VagaDTO> criarVaga(@RequestBody VagaDTO dto) {
-        System.out.println("VagaDTO recebido no controller: " + dto);
-        return ResponseEntity.ok(vagaService.criarVaga(dto));
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<VagaDTO> criarVaga(
+            @RequestParam("dto") String dtoJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+        VagaDTO dto = objectMapper.readValue(dtoJson, VagaDTO.class);
+        return ResponseEntity.ok(vagaService.criarVaga(dto, file));
     }
 
-    // USUARIO pode editar própria vaga, ADMINISTRADOR pode editar qualquer
+    // Atualizar vaga
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
-    @PutMapping("/{id}")
-    public ResponseEntity<VagaDTO> atualizarVaga(@PathVariable Long id, @RequestBody VagaDTO dto) {
-        Optional<VagaDTO> atualizada = vagaService.atualizarVaga(id, dto);
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<VagaDTO> atualizarVaga(
+            @PathVariable Long id,
+            @RequestParam("dto") String dtoJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+        VagaDTO dto = objectMapper.readValue(dtoJson, VagaDTO.class);
+        Optional<VagaDTO> atualizada = vagaService.atualizarVaga(id, dto, file);
         return atualizada.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // USUARIO pode excluir própria vaga, ADMINISTRADOR qualquer
+    // Excluir vaga
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirVaga(@PathVariable Long id) {

@@ -1,11 +1,13 @@
 package com.tcc.blogperiferico.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tcc.blogperiferico.dto.VendaDTO;
 import com.tcc.blogperiferico.services.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,9 @@ public class VendaController {
 
     @Autowired
     private VendaService vendaService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     // VISITANTE pode visualizar
     @GetMapping
@@ -30,23 +35,31 @@ public class VendaController {
         return venda.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // USUARIO e ADMINISTRADOR podem criar
+    // Criar venda com imagem
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
-    @PostMapping
-    public ResponseEntity<VendaDTO> criarVenda(@RequestBody VendaDTO dto) {
-        System.out.println("VendaDTO recebido no controller: " + dto);
-        return ResponseEntity.ok(vendaService.criarVenda(dto));
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<VendaDTO> criarVenda(
+            @RequestParam("dto") String dtoJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+        VendaDTO dto = objectMapper.readValue(dtoJson, VendaDTO.class);
+        return ResponseEntity.ok(vendaService.criarVenda(dto, file));
     }
 
-    // USUARIO pode editar própria venda, ADMINISTRADOR pode editar qualquer
+    // Atualizar venda
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
-    @PutMapping("/{id}")
-    public ResponseEntity<VendaDTO> atualizarVenda(@PathVariable Long id, @RequestBody VendaDTO dto) {
-        Optional<VendaDTO> atualizada = vendaService.atualizarVenda(id, dto);
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<VendaDTO> atualizarVenda(
+            @PathVariable Long id,
+            @RequestParam("dto") String dtoJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+        VendaDTO dto = objectMapper.readValue(dtoJson, VendaDTO.class);
+        Optional<VendaDTO> atualizada = vendaService.atualizarVenda(id, dto, file);
         return atualizada.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // USUARIO pode excluir própria venda, ADMINISTRADOR qualquer
+    // Excluir venda
     @PreAuthorize("hasAnyRole('USUARIO', 'ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirVenda(@PathVariable Long id) {

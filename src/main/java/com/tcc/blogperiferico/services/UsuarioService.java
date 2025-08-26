@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tcc.blogperiferico.dto.UsuarioDTO;
 import com.tcc.blogperiferico.entities.Usuario;
@@ -21,6 +22,9 @@ public class UsuarioService {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    AzureBlobService azureBlobService; // ✅ usado para upload
 
     public UsuarioDTO listar(Long id) {
         return new UsuarioDTO(repository.findById(id)
@@ -42,6 +46,8 @@ public class UsuarioService {
         usuario.setEmail(user.getEmail());
         usuario.setSenha(encoder.encode(user.getSenha()));
         usuario.setRoles(UsuarioRole.ROLE_USUARIO);
+        usuario.setFotoPerfil(user.getFotoPerfil());
+
         return new UsuarioDTO(repository.save(usuario));
     }
 
@@ -57,6 +63,7 @@ public class UsuarioService {
         usuario.setEmail(user.getEmail());
         usuario.setSenha(encoder.encode(user.getSenha()));
         usuario.setRoles(user.getRoles());
+        usuario.setFotoPerfil(user.getFotoPerfil());
 
         return new UsuarioDTO(repository.save(usuario));
     }
@@ -65,20 +72,23 @@ public class UsuarioService {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new SemResultadosException("atualização."));
 
-        if (!user.getNome().equals(usuario.getNome())) {
-            usuario.setNome(user.getNome());
-        }
+        if (!user.getNome().equals(usuario.getNome())) usuario.setNome(user.getNome());
+        if (!user.getEmail().equals(usuario.getEmail())) usuario.setEmail(user.getEmail());
+        if (!user.getSenha().equals(usuario.getSenha())) usuario.setSenha(encoder.encode(user.getSenha()));
+        if (!user.getRoles().equals(usuario.getRoles())) usuario.setRoles(user.getRoles());
+        if (user.getFotoPerfil() != null) usuario.setFotoPerfil(user.getFotoPerfil());
 
-        if (!user.getEmail().equals(usuario.getEmail())) {
-            usuario.setEmail(user.getEmail());
-        }
+        return new UsuarioDTO(repository.save(usuario));
+    }
 
-        if (!user.getSenha().equals(usuario.getSenha())) {
-            usuario.setSenha(encoder.encode(user.getSenha()));
-        }
+    // Atualizar só a foto do perfil
+    public UsuarioDTO atualizarFoto(Long id, MultipartFile file) {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new SemResultadosException("usuário não encontrado."));
 
-        if (!user.getRoles().equals(usuario.getRoles())) {
-            usuario.setRoles(user.getRoles());
+        if (file != null && !file.isEmpty()) {
+            String url = azureBlobService.uploadFile(file);
+            usuario.setFotoPerfil(url);
         }
 
         return new UsuarioDTO(repository.save(usuario));

@@ -7,6 +7,7 @@ import com.tcc.blogperiferico.repository.UsuarioRepository;
 import com.tcc.blogperiferico.repository.VagaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,66 +23,71 @@ public class VagaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Criar novo anúncio
-    public VagaDTO criarVaga(VagaDTO dto) {
-        System.out.println("VagaDTO recebido no serviço: " + dto);
-        // Buscar o usuário pelo idUsuario
+    @Autowired
+    private AzureBlobService azureBlobService;
+
+    // Criar nova vaga
+    public VagaDTO criarVaga(VagaDTO dto, MultipartFile file) {
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
-        System.out.println("Usuário encontrado: " + usuario.getEmail());
 
-        // Criar a entidade Vaga
         Vaga vaga = new Vaga();
         vaga.setTitulo(dto.getTitulo());
         vaga.setDescricao(dto.getDescricao());
-        vaga.setImagem(dto.getImagem());
         vaga.setZona(dto.getZona());
-        vaga.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+
+        if (file != null && !file.isEmpty()) {
+            String urlImagem = azureBlobService.uploadFile(file);
+            vaga.setImagem(urlImagem);
+        }
+
+        vaga.setDataHoraCriacao(LocalDateTime.now());
         vaga.setIDUsuario(usuario);
 
-        // Salvar no banco
         vaga = vagaRepository.save(vaga);
-        System.out.println("Vaga salva: " + vaga.getId());
-
-        // Retornar DTO
         return new VagaDTO(vaga);
     }
 
-    // Listar todos os anúncios
+    // Listar
     public List<VagaDTO> listarVagas() {
-        List<Vaga> vagas = vagaRepository.findAll();
-        return vagas.stream()
+        return vagaRepository.findAll().stream()
                 .map(VagaDTO::new)
                 .collect(Collectors.toList());
     }
 
-    // Buscar anúncio por ID
+    // Buscar por ID
     public Optional<VagaDTO> buscarPorId(Long id) {
-        Optional<Vaga> vaga = vagaRepository.findById(id);
-        return vaga.map(VagaDTO::new);
+        return vagaRepository.findById(id).map(VagaDTO::new);
     }
 
-    // Atualizar anúncio
-    public Optional<VagaDTO> atualizarVaga(Long id, VagaDTO dto) {
+    // Atualizar vaga
+    public Optional<VagaDTO> atualizarVaga(Long id, VagaDTO dto, MultipartFile file) {
         Optional<Vaga> vagaOpt = vagaRepository.findById(id);
         if (vagaOpt.isPresent()) {
             Vaga vaga = vagaOpt.get();
-            // Buscar o usuário pelo idUsuario
+
             Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
+
             vaga.setTitulo(dto.getTitulo());
             vaga.setDescricao(dto.getDescricao());
-            vaga.setImagem(dto.getImagem());
             vaga.setZona(dto.getZona());
-            vaga.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+
+            if (file != null && !file.isEmpty()) {
+                String urlImagem = azureBlobService.uploadFile(file);
+                vaga.setImagem(urlImagem);
+            }
+
+            vaga.setDataHoraCriacao(LocalDateTime.now());
             vaga.setIDUsuario(usuario);
-            vagaRepository.save(vaga);
+
+            vaga = vagaRepository.save(vaga);
             return Optional.of(new VagaDTO(vaga));
         }
         return Optional.empty();
     }
 
-    // Excluir anúncio
+    // Excluir vaga
     public boolean excluirVaga(Long id) {
         if (vagaRepository.existsById(id)) {
             vagaRepository.deleteById(id);

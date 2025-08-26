@@ -7,6 +7,7 @@ import com.tcc.blogperiferico.repository.DoacaoRepository;
 import com.tcc.blogperiferico.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,70 +21,73 @@ public class DoacaoService {
     private DoacaoRepository doacaoRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository; // Adicionado
+    private UsuarioRepository usuarioRepository;
 
-    // Criar nova Doacao
-    public DoacaoDTO criarDoacao(DoacaoDTO dto) {
-        System.out.println("DoacaoDTO recebido no serviço: " + dto);
-        // Buscar o usuário pelo idUsuario
+    @Autowired
+    private AzureBlobService azureBlobService;
+
+    // Criar nova doação
+    public DoacaoDTO criarDoacao(DoacaoDTO dto, MultipartFile file) {
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
-        System.out.println("Usuário encontrado: " + usuario.getEmail());
 
-        // Criar a entidade Doacao
         Doacao doacao = new Doacao();
         doacao.setTitulo(dto.getTitulo());
         doacao.setDescricao(dto.getDescricao());
-        doacao.setImagem(dto.getImagem());
         doacao.setZona(dto.getZona());
         doacao.setTelefone(dto.getTelefone());
-        doacao.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+
+        if (file != null && !file.isEmpty()) {
+            String urlImagem = azureBlobService.uploadFile(file);
+            doacao.setImagem(urlImagem);
+        }
+
+        doacao.setDataHoraCriacao(LocalDateTime.now());
         doacao.setIdUsuario(usuario);
 
-        // Salvar no banco
         doacao = doacaoRepository.save(doacao);
-        System.out.println("Doação salva: " + doacao.getId());
-
-        // Retornar DTO
         return new DoacaoDTO(doacao);
     }
 
-    // Listar todos os anúncios
+    // Listar
     public List<DoacaoDTO> listarDoacoes() {
-        List<Doacao> doacoes = doacaoRepository.findAll();
-        return doacoes.stream()
-                .map(DoacaoDTO::new)
-                .collect(Collectors.toList());
+        return doacaoRepository.findAll().stream().map(DoacaoDTO::new).collect(Collectors.toList());
     }
 
-    // Buscar anúncio por ID
+    // Buscar por ID
     public Optional<DoacaoDTO> buscarPorId(Long id) {
-        Optional<Doacao> doacao = doacaoRepository.findById(id);
-        return doacao.map(DoacaoDTO::new);
+        return doacaoRepository.findById(id).map(DoacaoDTO::new);
     }
 
-    // Atualizar anúncio
-    public Optional<DoacaoDTO> atualizarDoacao(Long id, DoacaoDTO dto) {
+    // Atualizar doação
+    public Optional<DoacaoDTO> atualizarDoacao(Long id, DoacaoDTO dto, MultipartFile file) {
         Optional<Doacao> doacaoOpt = doacaoRepository.findById(id);
         if (doacaoOpt.isPresent()) {
             Doacao doacao = doacaoOpt.get();
-            // Buscar o usuário pelo idUsuario
+
             Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                     .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getIdUsuario()));
+
             doacao.setTitulo(dto.getTitulo());
             doacao.setDescricao(dto.getDescricao());
-            doacao.setImagem(dto.getImagem());
             doacao.setZona(dto.getZona());
             doacao.setTelefone(dto.getTelefone());
-            doacao.setDataHoraCriacao(dto.getDataHoraCriacao() != null ? dto.getDataHoraCriacao() : LocalDateTime.now());
+
+            if (file != null && !file.isEmpty()) {
+                String urlImagem = azureBlobService.uploadFile(file);
+                doacao.setImagem(urlImagem);
+            }
+
+            doacao.setDataHoraCriacao(LocalDateTime.now());
             doacao.setIdUsuario(usuario);
-            doacaoRepository.save(doacao);
+
+            doacao = doacaoRepository.save(doacao);
             return Optional.of(new DoacaoDTO(doacao));
         }
         return Optional.empty();
     }
 
-    // Excluir anúncio
+    // Excluir
     public boolean excluirDoacao(Long id) {
         if (doacaoRepository.existsById(id)) {
             doacaoRepository.deleteById(id);
